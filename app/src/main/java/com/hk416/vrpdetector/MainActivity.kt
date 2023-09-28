@@ -1,11 +1,13 @@
 package com.hk416.vrpdetector
 
+import ai.onnxruntime.OrtEnvironment
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Size
+import android.view.Surface
 import android.view.WindowManager
 import android.widget.TextView
 import androidx.camera.core.CameraSelector
@@ -21,6 +23,11 @@ import java.util.concurrent.Executors
 class MainActivity : AppCompatActivity() {
     private lateinit var cameraView: PreviewView
     private lateinit var detectTextView: TextView
+    private lateinit var outlineView: OutlineView
+
+    private lateinit var ortEnvironment: OrtEnvironment
+
+    private var plateDetectPass = PlateDetectPass(context = this)
 
     companion object {
         private const val REQUEST_CODE_PERMISSIONS = 10
@@ -38,6 +45,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         cameraView = findViewById(R.id.cameraView)
         detectTextView = findViewById(R.id.detectTextView)
+        outlineView = findViewById(R.id.outlineView)
 
         // (한국어) 화면이 계속 켜져 있도록 설정합니다.
         // (English Translation) Set the screen to stay on.
@@ -59,7 +67,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setup() {
-        // pass
+        ortEnvironment = OrtEnvironment.getEnvironment()
+        plateDetectPass.loadModel(ortEnvironment)
     }
 
     private fun run() {
@@ -73,7 +82,9 @@ class MainActivity : AppCompatActivity() {
                 it.setSurfaceProvider(cameraView.surfaceProvider)
             }
         val analysis = ImageAnalysis.Builder()
+            .setOutputImageRotationEnabled(true)
             .setTargetResolution(Size(640, 640))
+            .setTargetRotation(Surface.ROTATION_0)
             .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
             .build()
             .also { analysis ->
@@ -92,7 +103,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun imageProcess(imageProxy: ImageProxy) {
-        // pass
+        val detectPlates = plateDetectPass.process(ortEnvironment, imageProxy)
+        outlineView.setBoxes(detectPlates)
+        outlineView.invalidate()
     }
 
     private fun allPermissionsGranted() = Companion.REQUIRED_PERMISSIONS.all {

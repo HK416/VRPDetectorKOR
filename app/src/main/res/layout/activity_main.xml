@@ -17,6 +17,12 @@
             android:id="@+id/cameraView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
+
+        <com.hk416.vrpdetector.OutlineView
+            android:id="@+id/outlineView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/transparent"/>
     </FrameLayout>
     
     <TextView
