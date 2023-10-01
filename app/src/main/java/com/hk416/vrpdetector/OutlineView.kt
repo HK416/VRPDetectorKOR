@@ -28,12 +28,10 @@ class OutlineView(context: Context, attributeSet: AttributeSet): View(context, a
 
     private fun drawBoxes(canvas: Canvas?) {
         boxes?.forEach {
-            val scaleX = width / it.inputSize.toFloat()
-            val scaleY = height / it.inputSize.toFloat()
-            val startX = it.rect.left * scaleX
-            val startY = it.rect.top * scaleY
-            val stopX = it.rect.right * scaleX
-            val stopY = it.rect.bottom * scaleY
+            val startX = (it.rect.left + it.offsetX) * width
+            val startY = (it.rect.top + it.offsetY) * height
+            val stopX = (it.rect.right + it.offsetX) * width
+            val stopY = (it.rect.bottom + it.offsetY) * height
 
             drawLine(canvas, startX, startY, stopX, startY)
             drawLine(canvas, startX, stopY, stopX, stopY)

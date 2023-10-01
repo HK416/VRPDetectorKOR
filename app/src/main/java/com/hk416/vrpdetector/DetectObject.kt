@@ -27,7 +27,8 @@ data class DetectRect(
 
 data class DetectObject(
     val cls: Int,
-    val inputSize: Int,
+    var offsetX: Float,
+    var offsetY: Float,
     var rect: DetectRect,
     var conf: Float,
 ) {

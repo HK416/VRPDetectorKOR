@@ -3,6 +3,7 @@ package com.hk416.vrpdetector
 import ai.onnxruntime.OrtEnvironment
 import android.Manifest
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -28,6 +29,10 @@ class MainActivity : AppCompatActivity() {
     private lateinit var ortEnvironment: OrtEnvironment
 
     private var plateDetectPass = PlateDetectPass(context = this)
+    private var numberDetectPass = NumberDetectPass(context = this)
+    private var elapsedTimeSec = 0.0f
+    private var outputColor = Color.RED
+    private var outputTexts = ""
 
     companion object {
         private const val REQUEST_CODE_PERMISSIONS = 10
@@ -69,6 +74,7 @@ class MainActivity : AppCompatActivity() {
     private fun setup() {
         ortEnvironment = OrtEnvironment.getEnvironment()
         plateDetectPass.loadModel(ortEnvironment)
+        numberDetectPass.loadModel(ortEnvironment)
     }
 
     private fun run() {
@@ -100,15 +106,61 @@ class MainActivity : AppCompatActivity() {
             preview,
             analysis
         )
+
+        kotlin.concurrent.timer(period = 100) {
+            elapsedTimeSec += 0.1f
+
+            runOnUiThread {
+                detectTextView.setBackgroundColor(outputColor)
+                detectTextView.text = outputTexts
+            }
+        }
     }
 
     private fun imageProcess(imageProxy: ImageProxy) {
-        val detectPlates = plateDetectPass.process(ortEnvironment, imageProxy)
-        outlineView.setBoxes(detectPlates)
+        val boxes = ArrayList<DetectObject>()
+        var licenseTexts = String()
+        val detectPlates = plateDetectPass.process(ortEnvironment, imageProxy).apply {
+            sortByDescending { it.rect.area() }
+        }
+
+        for (plate in detectPlates) {
+            boxes.add(plate)
+            val numberPlates = numberDetectPass.process(ortEnvironment, imageProxy, plate).apply {
+                sortBy { it.rect.left }
+            }
+
+            var licenseText = String()
+            for (number in numberPlates) {
+                boxes.add(number)
+                licenseText += NumberDetectPass.DETECT_CHARS[number.cls]
+                if (number.cls > 9) {
+                    licenseText += " "
+                }
+            }
+
+            licenseTexts += (licenseText + "\n")
+        }
+
+        setOutputText(licenseTexts, if (licenseTexts.isEmpty()) { Color.RED } else { Color.GREEN })
+        outlineView.setBoxes(boxes)
         outlineView.invalidate()
     }
 
     private fun allPermissionsGranted() = Companion.REQUIRED_PERMISSIONS.all {
         ContextCompat.checkSelfPermission(baseContext, it) == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun setOutputText(text: String, color: Int) {
+        if (color == Color.GREEN) {
+            elapsedTimeSec = 0.0f
+            outputTexts = text
+            outputColor = color
+        }
+        else if (elapsedTimeSec > 3.0) {
+            elapsedTimeSec = 0.0f
+            outputTexts = text
+            outputColor = color
+        }
     }
 }

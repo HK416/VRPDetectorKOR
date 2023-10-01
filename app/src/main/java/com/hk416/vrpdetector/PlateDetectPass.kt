@@ -9,7 +9,6 @@ import androidx.camera.core.ImageProxy
 import java.io.ByteArrayOutputStream
 import java.nio.FloatBuffer
 import java.util.Collections
-import java.util.PriorityQueue
 import kotlin.math.max
 import kotlin.math.min
 
@@ -113,13 +112,13 @@ class PlateDetectPass(val context: Context) {
                     val width = outputs[i][2][k]
                     val height = outputs[i][3][k]
                     val rect = DetectRect(
-                        top = max(yOrigin - 0.5f * height, 0.0f),
-                        left = max(xOrigin - 0.5f * width, 0.0f),
-                        bottom = min(yOrigin + 0.5f * height, INPUT_SIZE - 1.0f),
-                        right = min(xOrigin + 0.5f * width, INPUT_SIZE - 1.0f)
+                        top = max(yOrigin - 0.5f * height, 0.0f) / INPUT_SIZE.toFloat(),
+                        left = max(xOrigin - 0.5f * width, 0.0f) / INPUT_SIZE.toFloat(),
+                        bottom = min(yOrigin + 0.5f * height, INPUT_SIZE - 1.0f) / INPUT_SIZE.toFloat(),
+                        right = min(xOrigin + 0.5f * width, INPUT_SIZE - 1.0f) / INPUT_SIZE.toFloat()
                     )
 
-                    objects.add(DetectObject(cls, INPUT_SIZE, rect, conf))
+                    objects.add(DetectObject(cls, offsetX = 0.0f, offsetY = 0.0f, rect, conf))
                 }
             }
         }
