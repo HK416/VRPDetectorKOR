@@ -10,7 +10,7 @@
 
 # 설계
 
-<center><img src="./images/layout.png" width="25%" height="25%"/></center>
+<img src="./images/layout.png" width="25%" height="25%"/>
 
 애플리케이션 상단 Camera View에는 카메라 미리 보기가, 애플리케이션 하단 Text View에는 인식한 자동차 번호판의 문자가 출력됩니다. </br>
 
@@ -22,6 +22,14 @@
 
 두 번째 단계에서 <b>[ultralytics(yolov8)](https://github.com/ultralytics/ultralytics)</b>로 학습된 차량 번호판 문자 인식 모델이 사용됩니다. 한국 차량 번호판에 사용되는 숫자와 문자를 인식하며, 학습에 사용된 데이터는 '<b>[링크](https://aihub.or.kr/aihubdata/data/view.do?currMenu=115&topMenu=100&aihubDataSe=realm&dataSetSn=172)</b>'를 사용했습니다. (라이센스 관련 [링크](https://aihub.or.kr/aihubnews/faq/list.do?currMenu=146&topMenu=104)) </br>
 
+# 결과
+
+<img src="./images/test.png" width="25%" height="25%"/>
+
+완성된 애플리케이션은 실시간으로 카메라의 이미지를 가져와 자동차 번호판을 인식하고, 번호판의 문자를 인식했습니다. </br>
+아쉬운 점은 번호판의 문자를 인식하는 부분이 미흡하여 애플리케이션이 잘못 인식할 때도 있었습니다. </br>
+특히 한글 인식률이 높지 않았고, 인식률을 높이기 위해 어쩔 수 없이 시간이 좀 더 오래 걸리는 모델을 사용했습니다. </br>
+아마 각 한글의 학습 데이터의 양이 많지 않아 인식률이 낮은 것으로 추측됩니다. </br>
 
 # Overview
 This is an Android application that recognizes Korean vehicle registration plates in real time using machine learning. </br>
@@ -31,7 +39,7 @@ The learned model is converted to <b>[onnx](https://onnxruntime.ai/)</b> file fo
 
 # Design
 
-<center><img src="./images/layout.png" width="25%" height="25%"/></center>
+<img src="./images/layout.png" width="25%" height="25%"/>
 
 A camera preview is displayed in the Camera View at the top of the application, and the text of the recognized license plate is displayed in the Text View at the bottom of the application. </br>
 
@@ -43,3 +51,12 @@ In the first step, a license plate recognition model trained with <b>[ultralytic
 
 
 In the second step, a license plate character recognition model trained with <b>[ultralytics(yolov8)](https://github.com/ultralytics/ultralytics)</b> is used. It recognizes numbers and letters used in Korean vehicle registration plates, and the data used for learning used '[link](https://aihub.or.kr/aihubdata/data/view.do?currMenu=115&topMenu=100&aihubDataSe=realm&dataSetSn=172)'. (License related [link]((https://aihub.or.kr/aihubnews/faq/list.do?currMenu=146&topMenu=104))) </br>
+
+# Result
+
+<img src="./images/test.png" width="25%" height="25%"/>
+
+The completed application took images from the camera in real time, recognized car license plates, and recognized the characters on the license plates. </br>
+What is disappointing is that the recognition of license plate characters was insufficient, so the application sometimes recognized them incorrectly. </br>
+In particular, the Hangul recognition rate was not high, and to increase the recognition rate, I had no choice but to use a model that took a bit longer. </br>
+It is presumed that the recognition rate is low because the amount of learning data for each Hangul is not large. </br>
